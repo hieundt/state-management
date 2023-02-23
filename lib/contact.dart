@@ -1,28 +1,45 @@
+import 'package:flutter/cupertino.dart';
+import 'package:uuid/uuid.dart';
+
 class Contact {
+  final String id;
   final String name;
-  const Contact({
+  Contact({
     required this.name,
-  });
+  }) : id = const Uuid().v4();
 }
 
-class ContactBook {
-  ContactBook._sharedInstance();
+class ContactBook extends ValueNotifier<List<Contact>> {
+  //* Singleton pattern
+  ContactBook._sharedInstance() : super([]);
   static final ContactBook _shared = ContactBook._sharedInstance();
   factory ContactBook() => _shared;
 
-  final List<Contact> _contacts = [];
+  //final List<Contact> _contacts = [];
 
-  int get length => _contacts.length;
+  //* We're extended ValueNotifier with a type of List<Contact>
+  //* So the 'value' itself is of type List<Contact>
+  int get length => value.length;
 
   void add({required Contact contact}) {
-    _contacts.add(contact);
+    //*  implicit way
+    // value.add(contact);
+    // notifyListeners();
+
+    //*  explicit way
+    final contacts = value;
+    contacts.add(contact);
+    notifyListeners();
   }
 
   void remove({required Contact contact}) {
-    _contacts.remove(contact);
+    final contacts = value;
+    if (contacts.contains(contact)) {
+      contacts.remove(contact);
+    }
   }
 
   Contact? getContact({required int atIndex}) {
-    return _contacts.length > atIndex ? _contacts[atIndex] : null;
+    return value.length > atIndex ? value[atIndex] : null;
   }
 }
